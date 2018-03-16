@@ -1,0 +1,109 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Sun Mar  4 16:25:39 2018
+This program simulates the dynamics of the replicator equation with pairwise interactions
+It creates statistics of the population abundancies and the number of survivors
+@author: stefan
+"""
+
+"Libraries"
+import numpy as np
+from scipy.integrate import odeint
+import matplotlib.pyplot as plt
+def flatten(input):
+    new_list = []
+    for i in input:
+        for j in i:
+            new_list.append(j)
+    return new_list
+"Parameters"
+
+"Number of species"
+N=10
+"Timespan of integration"
+iterations=1000
+"Number of realizations over which it is averaged"
+numberOfAverages=100;  
+numberOfIntervals=1;
+"Average of Gaussian Distribution for interaction matrix"
+mu=2
+"Variance of the Gaussian"
+sigma=1 
+"Strength of the interaction (A_ij=d*N(mu,sigma))"
+d=1
+s=10
+
+"Storage lists"
+"Final species abundancies after one realization"
+nfinal=[]
+"List with the number of survivors"
+survivor_list=[]
+lyapunov_list=[]
+
+
+
+for i in range(0,numberOfAverages):
+    B=np.random.rand(N)
+    def A(n):
+        A=s*B/sum(n)
+        return A
+    def pairwise(n,t):
+        dndt=np.dot(q,np.multiply(A(n),n))-np.multiply(n,np.dot(A(n),n))
+        return dndt
+    print(i)
+    survivor=0
+    "Random interaction matrix of dimension NxN"
+    q=d*np.random.uniform(0,1,(N,N))
+    l2norm = (((q)).sum(axis=0))
+    q=(q) / l2norm
+ 
+    
+    S=s*np.random.rand(N)
+
+    "Random start abundancies vector"
+    n0=np.random.rand(N)
+    n0=n0/sum(n0)
+    
+    t=np.linspace(0,iterations/numberOfIntervals)
+    
+    "Definition of the dynamics of the system"
+
+    for j in range(0,numberOfIntervals):
+        n=odeint(pairwise,n0,t)
+        nend=[x[len(x)-1] for x in (np.transpose(n))]
+        n0=nend
+    print(sum(n0))
+    if sum(nend)<=1.01 and sum(nend)>=0.99:
+        nfinal.append(np.transpose(nend))
+        survivor=[i for i in nend if i >= 0.000001]
+        survivor_list.append(len(survivor)/N)
+"End Averagflatten(flattening"
+"Plot histogram"
+#nfinal=flatten(flatten(nfinal))
+plt.figure(0)
+plt.hist(flatten(nfinal),bins=30)
+plt.yscale('log',nonposy='clip')
+plt.figure(1)
+plt.hist(survivor_list,bins=30)
+plt.figure(2)
+plt.plot(n)
+plt.figure(3)
+plt.plot(lyapunov_list,linewidth=0.001)
+plt.savefig('lyapunov.pdf', format='pdf', dpi=1000)
+#print(len(survivor_list)/numberOfAverages)
+#print(sum(survivor_list)/len(survivor_list))
+
+
+"Plot n"
+
+#plt.plot(t,n)
+#plt.xlabel('time')
+#plt.ylabel('n(t)')
+#plt.show()
+
+
+
+    
+
+
