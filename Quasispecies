@@ -4,6 +4,7 @@
 Created on Sun Mar  4 16:25:39 2018
 This program simulates the dynamics of the replicator equation with pairwise interactions
 It creates statistics of the population abundancies and the number of survivors
+And now this is a test
 @author: stefan
 """
 
